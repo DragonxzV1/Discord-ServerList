@@ -45,41 +45,42 @@ module.exports = {
     ],
 
     async execute(bot, interaction) {
-        if(!interaction.member.permissions.has('MANAGE_MESSAGES')) return interaction.reply({content: 'You are not allowed to use this command.', ephemeral:true});
-        let channel = interaction.options.getChannel('channel');
-        let name = interaction.options.getString('servername');
-        let description = interaction.options.getString('serverdescription');
-        let icon = interaction.options.getAttachment('servericon');
-        let ownerid = interaction.options.getUser('serverowner');
-        let link = interaction.options.getString('serverlink');
-        let type = interaction.options.getString('type');
+        if(!interaction.member.permissions.has('MANAGE_MESSAGES')) return await interaction.reply({content: 'You are not allowed to use this command.', ephemeral:true});
+        const channel = interaction.options.getChannel('channel');
+        const name = interaction.options.getString('servername');
+        const description = interaction.options.getString('serverdescription');
+        const icon = interaction.options.getAttachment('servericon');
+        const ownerid = interaction.options.getUser('serverowner');
+        const link = interaction.options.getString('serverlink');
+        const type = interaction.options.getString('type');
 
-        if(link) {
-         if(isUrl(link) === false) return interaction.reply({content: 'The link is not a valid URL.', ephemeral:true});
-        };
-        if(!db.has(`servers_${channel.parentId}.${channel.id}`)) interaction.reply({contnet: 'The type of the server is not valid.', ephemeral:true});
+        if (link && isUrl(link) === false) return await interaction.reply({content: 'The link is not a valid URL.', ephemeral:true});
+        if (!db.has(`servers_${channel.parentId}.${channel.id}`)) return await interaction.reply({contnet: 'The type of the server is not valid.', ephemeral:true});
 
         let info = db.get(`servers_${channel.parentId}.${channel.id}`);
-        if(name) if(info.name !== name) db.set(`servers_${channel.parentId}.${channel.id}.name`, name);
-        if(link) if(info.link !== link) db.set(`servers_${channel.parentId}.${channel.id}.link`, link);
-        if(description) if(info.description !== description) db.set(`servers_${channel.parentId}.${channel.id}.description`, description);
-        if(icon) if(info.icon !== icon.attachment) db.set(`servers_${channel.parentId}.${channel.id}.icon`, icon.attachment);
-        if(ownerid) if(info.ownerid.id !== ownerid.id) db.set(`servers_${channel.parentId}.${channel.id}.ownerid`, ownerid.id);
+        if (name && info.name !== name) db.set(`servers_${channel.parentId}.${channel.id}.name`, name);
+        if (link && info.link !== link) db.set(`servers_${channel.parentId}.${channel.id}.link`, link);
+        if (description && info.description !== description) db.set(`servers_${channel.parentId}.${channel.id}.description`, description);
+        if (icon && info.icon !== icon.attachment) db.set(`servers_${channel.parentId}.${channel.id}.icon`, icon.attachment);
+        if (ownerid && info.ownerid.id !== ownerid.id) db.set(`servers_${channel.parentId}.${channel.id}.ownerid`, ownerid.id);
 
-        let embed = new Discord.MessageEmbed()
-        .setAuthor({name: db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.name`), iconURL: db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.icon`) || interaction.guild.iconURL({dynamic:true})})
-        .setColor('BLUE')
-        .setDescription(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.description`) || '--')
-        .setThumbnail(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.icon`))
-        .addFields(
-            {name: 'Discord Link', value: `[Click Here](${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.link`)})`, inline: true},
-            {name: 'Server Owner', value: `<@${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.ownerid`)}>`, inline: true},
-            {name: 'Votes', value: `${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.votes`)}`, inline: true},
-        )
-        .setTimestamp()
-        .setFooter({text: '© Server List IL'})
+        const embed = new Discord.MessageEmbed()
+            .setAuthor({
+                name: db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.name`), 
+                iconURL: db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.icon`) || interaction.guild.iconURL({dynamic:true})
+            })
+            .setColor('BLUE')
+            .setDescription(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.description`) || '--')
+            .setThumbnail(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.icon`))
+            .addFields(
+                {name: 'Discord Link', value: `[Click Here](${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.link`)})`, inline: true},
+                {name: 'Server Owner', value: `<@${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.ownerid`)}>`, inline: true},
+                {name: 'Votes', value: `${db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.votes`)}`, inline: true},
+            )
+            .setTimestamp()
+            .setFooter({text: '© Server List IL'})
         await channel.messages.fetch(db.get(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.messageid`)));
         channel.messages.cache.get(db.get(`servers_${interaction.channel.parentId}.${interaction.channelId}.messageid`)).edit({embeds:[embed]});
-        interaction.reply({content: 'Server edited successfully.', ephemeral:true});
+        await interaction.reply({ content: 'Server edited successfully.', ephemeral:true });
     },
 };
