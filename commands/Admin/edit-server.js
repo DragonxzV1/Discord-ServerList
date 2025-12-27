@@ -57,7 +57,7 @@ module.exports = {
         if (link && isUrl(link) === false) return await interaction.reply({content: 'The link is not a valid URL.', ephemeral:true});
         if (!db.has(`servers_${channel.parentId}.${channel.id}`)) return await interaction.reply({contnet: 'The type of the server is not valid.', ephemeral:true});
 
-        let info = db.get(`servers_${channel.parentId}.${channel.id}`);
+        const info = db.get(`servers_${channel.parentId}.${channel.id}`);
         if (name && info.name !== name) db.set(`servers_${channel.parentId}.${channel.id}.name`, name);
         if (link && info.link !== link) db.set(`servers_${channel.parentId}.${channel.id}.link`, link);
         if (description && info.description !== description) db.set(`servers_${channel.parentId}.${channel.id}.description`, description);
